@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MacOut Dashboard MIG</title>
+    <link rel="stylesheet" href="./styles.css?v=20260302b" />
+    <style>
+      :root {
+        --bg: #f8f9fa;
+        --fg: #09090b;
+        --line: #e4e4e7;
+        --muted: #71717a;
+      }
+      body { margin: 0; background: var(--bg); color: var(--fg); font-family: Manrope, Arial, Helvetica, sans-serif; }
+      .dashboard-layout { display: grid; grid-template-columns: 260px 1fr; min-height: 100vh; }
+      .sidebar { border-right: 1px solid var(--line); background: #fff; padding: 18px; }
+      .sidebar h2 { margin: 0 0 10px; font-size: 2rem; }
+      .meta { color: var(--muted); }
+      .side-nav { display: grid; gap: 8px; margin-top: 14px; }
+      .side-nav button { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 10px; text-align: left; cursor: pointer; font-weight: 700; }
+      .side-nav button.active { border-color: #111827; background: #f5f7fb; color: #111827; }
+      .main { padding: 20px; }
+      .panel { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+      .panel h1, .panel h2 { margin: 0 0 14px; font-size: 2.2rem; line-height: 1.1; }
+      .btn { border: 0; border-radius: 10px; padding: 10px 14px; cursor: pointer; font-weight: 700; background: #111827; color: #fff; font-family: inherit; }
+      .btn.secondary { border: 1px solid var(--line); background: #fff; color: #111827; }
+      #productForm, #transactionForm, #testimonialForm { margin-bottom: 16px; }
+      .form-grid { display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 14px; }
+      .field { display: flex; flex-direction: column; gap: 6px; }
+      .field-span-2 { grid-column: span 2; }
+      .field label { font-size: 0.93rem; font-weight: 700; }
+      .field input, .field textarea, .field select { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font: inherit; background: #fff; }
+      .field textarea { min-height: 94px; resize: vertical; }
+      .form-actions { display: flex; gap: 10px; margin-top: 12px; }
+      .summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; }
+      .summary .item { border: 1px solid var(--line); border-radius: 12px; padding: 10px; background: #fafcff; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { border-bottom: 1px solid var(--line); padding: 12px 8px; text-align: left; vertical-align: top; }
+      .actions { display: flex; gap: 6px; }
+      .actions button { border: 1px solid var(--line); background: #fff; padding: 6px 8px; border-radius: 8px; cursor: pointer; }
+      .actions button.delete { border-color: #ffd3d9; color: #d7263d; }
+      .hidden { display: none; }
+      @media (max-width: 900px) {
+        .dashboard-layout { grid-template-columns: 1fr; }
+        .sidebar { border-right: 0; border-bottom: 1px solid var(--line); }
+        .form-grid { grid-template-columns: 1fr; }
+        .field-span-2 { grid-column: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="dashboard-layout">
+      <aside class="sidebar">
+        <h2>Dashboard</h2>
+        <p class="meta">Código de acceso local</p>
+
+        <nav class="side-nav">
+          <button class="tab-btn active" data-tab="resumen">Resumen</button>
+          <button class="tab-btn" data-tab="equipos">Equipos</button>
+          <button class="tab-btn" data-tab="finanzas">Finanzas</button>
+          <button class="tab-btn" data-tab="testimonios">Testimonios</button>
+        </nav>
+
+        <br />
+        <button id="logoutBtn" class="btn secondary">Cerrar sesión</button>
+      </aside>
+
+      <main class="main">
+        <section id="resumen" class="panel tab-panel">
+          <h1>Resumen general</h1>
+          <div class="summary" id="summaryCards"></div>
+        </section>
+
+        <section id="equipos" class="panel tab-panel hidden">
+          <h2>Gestión de equipos</h2>
+          <form id="productForm">
+            <input type="hidden" id="productId" />
+            <div class="form-grid">
+              <div class="field">
+                <label for="productName">Título</label>
+                <input id="productName" required />
+              </div>
+
+              <div class="field field-span-2">
+                <label for="productDescription">Descripción</label>
+                <textarea id="productDescription" required></textarea>
+              </div>
+
+              <div class="field">
+                <label for="productImage">URL de imagen</label>
+                <input id="productImage" type="url" required />
+              </div>
+
+              <div class="field">
+                <label for="productPrice">Precio</label>
+                <input id="productPrice" type="number" min="0.01" step="0.01" required />
+              </div>
+
+              <div class="field">
+                <label for="productBuyLink">URL compra</label>
+                <input id="productBuyLink" type="url" required />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn" type="submit">Guardar equipo</button>
+              <button class="btn secondary" type="button" id="cancelProductEdit">Cancelar edición</button>
+            </div>
+          </form>
+
+          <hr />
+          <table>
+            <thead>
+              <tr>
+                <th>Equipo</th>
+                <th>Precio</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody"></tbody>
+          </table>
+        </section>
+
+        <section id="finanzas" class="panel tab-panel hidden">
+          <h2>Gestión financiera</h2>
+          <form id="transactionForm">
+            <input type="hidden" id="transactionId" />
+            <div class="form-grid">
+              <div class="field">
+                <label for="transactionType">Tipo</label>
+                <select id="transactionType" required>
+                  <option value="income">Ingreso</option>
+                  <option value="expense">Gasto</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="transactionTitle">Título</label>
+                <input id="transactionTitle" required />
+              </div>
+
+              <div class="field field-span-2">
+                <label for="transactionDescription">Descripción</label>
+                <textarea id="transactionDescription"></textarea>
+              </div>
+
+              <div class="field">
+                <label for="transactionAmount">Importe</label>
+                <input id="transactionAmount" type="number" min="0.01" step="0.01" required />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn" type="submit">Guardar transacción</button>
+              <button class="btn secondary" type="button" id="cancelTransactionEdit">Cancelar edición</button>
+            </div>
+          </form>
+
+          <hr />
+          <table>
+            <thead>
+              <tr>
+                <th>Título</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+                <th>Importe</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="transactionsTableBody"></tbody>
+          </table>
+        </section>
+
+        <section id="testimonios" class="panel tab-panel hidden">
+          <h2>Gestión de testimonios</h2>
+          <form id="testimonialForm">
+            <div class="form-grid">
+              <div class="field">
+                <label for="testimonialName">Nombre</label>
+                <input id="testimonialName" required />
+              </div>
+
+              <div class="field field-span-2">
+                <label for="testimonialReview">Comentario</label>
+                <textarea id="testimonialReview" required></textarea>
+              </div>
+
+              <div class="field">
+                <label for="testimonialStars">Estrellas (1-5)</label>
+                <input id="testimonialStars" type="number" min="1" max="5" value="5" required />
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button class="btn" type="submit">Guardar testimonio</button>
+            </div>
+          </form>
+
+          <hr />
+          <table>
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th>Comentario</th>
+                <th>Estrellas</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="testimonialsTableBody"></tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <script src="./dashboard.js?v=20260302b"></script>
+  </body>
+</html>

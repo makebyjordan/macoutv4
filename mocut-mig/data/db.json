@@ -1,0 +1,39 @@
+{
+  "products": [
+    {
+      "id": "p-demo-1",
+      "name": "MacBook Pro 13 M2",
+      "description": "8GB RAM, 512GB SSD, estado excelente.",
+      "image": "https://picsum.photos/seed/macbook/600/400",
+      "price": 1299,
+      "buyLink": "https://example.com/macbook"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "t-demo-1",
+      "type": "income",
+      "title": "Venta MacBook Pro",
+      "description": "Venta directa a cliente",
+      "amount": 1299,
+      "date": "2026-03-01T12:00:00.000Z"
+    },
+    {
+      "id": "t-demo-2",
+      "type": "expense",
+      "title": "Compra de lote",
+      "description": "Compra inicial de equipos",
+      "amount": 750,
+      "date": "2026-03-01T09:30:00.000Z"
+    }
+  ],
+  "testimonials": [
+    {
+      "id": "r-demo-1",
+      "name": "Laura G.",
+      "review": "Muy buena experiencia, equipo impecable y atención rápida.",
+      "stars": 5,
+      "avatar": "LG"
+    }
+  ]
+}

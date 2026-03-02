@@ -1,0 +1,10 @@
+{
+  "name": "mocut-mig",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MacOut migrado a HTML/CSS/JS + backend Node con base de datos básica JSON",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "NODE_ENV=production node server.js"
+  }
+}
